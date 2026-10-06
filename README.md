@@ -40,18 +40,19 @@ To remove it: `/plugin uninstall reeve@reeve`.
 
 Each capture also carries the Claude Code `session_id` and the working directory (`cwd`), so turns group into one transcript per session.
 
-It does **not** capture tool calls, tool output, file contents or Claude's intermediate messages. It captures only what you asked and the conclusion Claude reached. Reeve distills durable facts from these transcripts later. Each distilled fact cites the transcript it came from.
+It does **not** capture tool calls, tool output, file contents or Claude's intermediate messages. It captures only what you asked and the conclusion Claude reached.
 
 ## What it recalls
 
 On every `UserPromptSubmit`, `memory_recall_context` receives your prompt, `session_id` and `cwd`. It returns memory relevant to that prompt, which Claude Code adds to the turn's context. If nothing is relevant, it returns nothing and no context is added.
 
-Recall rides on the first prompt rather than on `SessionStart`. Claude Code skips `mcp_tool` hooks on `SessionStart` at launch, because MCP servers aren't connected yet.
+Recall runs on `UserPromptSubmit`, not `SessionStart`: Claude Code skips `mcp_tool` hooks on `SessionStart` at launch, because MCP servers aren't connected yet.
 
 Both `UserPromptSubmit` hooks have a 15-second timeout, below Claude Code's 30-second default for that event. The `Stop` capture also has a 15-second timeout.
 
 ## Privacy
 
+- **What leaves your machine:** the full text of every prompt you submit (including anything you paste into it) and of Claude's final reply each turn, plus the session id and working-directory path. Don't paste secrets into prompts with the plugin enabled.
 - **Personal scope only.** Captured turns go to your **personal** Reeve corpus, under the account you signed in with in `/mcp`. They are not written to an organization or team scope.
 - **Opt out:** turn off automatic memory writes in your Reeve memory settings (`auto_write_enabled`). To stop the hooks entirely, disable the plugin (`/plugin`) or uninstall it.
 - The plugin contains no credentials. Authentication is the OAuth token Claude Code holds for the `reeve` server.
