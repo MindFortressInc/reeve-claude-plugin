@@ -1,0 +1,51 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "plugin:reeve:reeve",
+            "tool": "memory_capture_turn",
+            "input": {
+              "session_id": "${session_id}",
+              "role": "user",
+              "text": "${prompt}",
+              "cwd": "${cwd}"
+            },
+            "timeout": 15
+          },
+          {
+            "type": "mcp_tool",
+            "server": "plugin:reeve:reeve",
+            "tool": "memory_recall_context",
+            "input": {
+              "session_id": "${session_id}",
+              "prompt": "${prompt}",
+              "cwd": "${cwd}"
+            },
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "mcp_tool",
+            "server": "plugin:reeve:reeve",
+            "tool": "memory_capture_turn",
+            "input": {
+              "session_id": "${session_id}",
+              "role": "assistant",
+              "text": "${last_assistant_message}",
+              "cwd": "${cwd}"
+            },
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}

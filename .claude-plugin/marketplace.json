@@ -1,0 +1,15 @@
+{
+  "name": "reeve",
+  "description": "Reeve plugins for Claude Code",
+  "owner": {
+    "name": "MindFortress",
+    "url": "https://github.com/MindFortressInc"
+  },
+  "plugins": [
+    {
+      "name": "reeve",
+      "source": "./plugins/reeve",
+      "description": "Reeve MCP tools plus automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve corpus"
+    }
+  ]
+}

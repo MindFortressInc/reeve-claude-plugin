@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "reeve": {
+      "type": "http",
+      "url": "https://api.meetreeve.com/mcp/claude"
+    }
+  }
+}
