@@ -1,7 +1,7 @@
 {
   "name": "reeve",
   "displayName": "Reeve",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Reeve MCP tools plus automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve corpus",
   "author": {
     "name": "MindFortress",

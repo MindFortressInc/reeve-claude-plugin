@@ -2,7 +2,7 @@
 
 A Claude Code plugin marketplace with one plugin, `reeve`. The plugin does two things:
 
-1. It connects Claude Code to the remote Reeve MCP server at `https://api.meetreeve.com/mcp`, which provides the full Reeve tool surface.
+1. It connects Claude Code to the remote Reeve MCP server at `https://api.meetreeve.com/mcp/code`, which provides the full Reeve tool surface.
 2. It turns on **automatic memory**. Before each prompt, relevant memory from your Reeve account is recalled into context. Each turn is captured to your personal Reeve corpus.
 
 Nothing runs locally. The plugin is only configuration: an MCP server entry plus `mcp_tool` hooks that call that server over Claude Code's own OAuth. It needs no API key, venv or local credential.
@@ -26,10 +26,14 @@ Select `plugin:reeve:reeve` and complete the browser sign-in with your Reeve acc
 
 To remove it: `/plugin uninstall reeve@reeve`.
 
+### Upgrading from 0.1.x
+
+Version 0.2.0 moved the plugin's server from `https://api.meetreeve.com/mcp` to `https://api.meetreeve.com/mcp/code`. The server name stays `plugin:reeve:reeve`, but Claude Code stores each MCP server's OAuth token under the server name plus a hash of its type, URL and headers, so the token saved for the old URL is not used for the new one. After updating, run `/mcp`, select `plugin:reeve:reeve` and sign in again. Until you do, the hooks fail as non-blocking errors, as described above.
+
 ### If you already have Reeve configured
 
-- **claude.ai Reeve connector.** This can stay on. The plugin uses `https://api.meetreeve.com/mcp`, the canonical Reeve MCP endpoint (it is the OAuth protected resource the server advertises). The claude.ai Reeve connector uses `https://api.meetreeve.com/mcp/claude`. Both URLs serve the same Reeve tools. Claude Code 2.1.292 suppresses a plugin server whose URL matches a claude.ai connector (debug log: `Lazy dedup: suppressing 1 plugin server(s) that duplicate claude.ai connectors: plugin:reeve:reeve`), and the memory hooks then have no server to call. That is why the plugin does not use the connector URL. With the plugin on `/mcp` and the connector enabled, no dedup line was logged, so the two coexist.
-- **A manually added server at the same URL** (`claude mcp add`, `.mcp.json` or `~/.claude.json`). Local, project and user servers take precedence over plugin servers, so Claude Code would hide this plugin's server and the memory hooks would have no server to call. Remove the manual entry and use the plugin.
+- **claude.ai or Claude Desktop Reeve connector.** This can stay on. The plugin has its own URL, `https://api.meetreeve.com/mcp/code`, which serves the same Reeve tools as the connector URLs (`https://api.meetreeve.com/mcp` and `https://api.meetreeve.com/mcp/claude`). Claude Code suppresses a plugin server whose URL matches a claude.ai connector (debug log: `Lazy dedup: suppressing 1 plugin server(s) that duplicate claude.ai connectors: plugin:reeve:reeve`), and the memory hooks then have no server to call. Because no connector uses `/mcp/code`, the plugin and a connector on `/mcp` or `/mcp/claude` coexist.
+- **A manually added server at the same URL** (`https://api.meetreeve.com/mcp/code`, added with `claude mcp add`, `.mcp.json` or `~/.claude.json`). Local, project and user servers take precedence over plugin servers, so Claude Code would hide this plugin's server and the memory hooks would have no server to call. Remove the manual entry and use the plugin.
 
 ## What it captures
 
@@ -66,7 +70,7 @@ This plugin does **not** set `CLAUDE_CODE_DISABLE_AUTO_MEMORY`. Claude Code's bu
 ```
 .claude-plugin/marketplace.json        marketplace "reeve", one plugin entry
 plugins/reeve/.claude-plugin/plugin.json
-plugins/reeve/.mcp.json                server "reeve" -> https://api.meetreeve.com/mcp
+plugins/reeve/.mcp.json                server "reeve" -> https://api.meetreeve.com/mcp/code
 plugins/reeve/hooks/hooks.json         UserPromptSubmit + Stop mcp_tool hooks
 ```
 
