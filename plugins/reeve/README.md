@@ -38,7 +38,7 @@ That is everything the hooks send. **Tool calls, tool output, file contents and 
 - **Where it goes:** your **personal** Reeve memory, under the account you signed in with. Only you can read it. It is not shared with your organization or team.
 - **What Reeve does with it:** Reeve removes credentials, tokens and personal identifiers it recognizes before storing a turn. It indexes captured text for search, and may condense each day's captured turns into short facts in the same personal memory. Recall returns memory relevant to your prompt, which Claude adds to that turn's context. On the first prompt of a session it also adds the rules you saved in Reeve. Otherwise, when nothing is relevant, nothing is added.
 - **AI providers:** to do this, Reeve sends captured text and each recall prompt to OpenAI to create search embeddings, sends recall prompts and candidate memories to Voyage AI to rank results, and sends each day's captured turns to Anthropic's Claude to condense them. When your sign-in isn't tied to one organization, Reeve may also send the first 4,000 characters of a captured turn to Google Gemini to work out which of your workspaces it belongs to.
-- The full text of each prompt leaves your machine, including anything you paste into it. Don't paste secrets into prompts while capture is on.
+- The full text of each prompt leaves your machine, including anything you paste into it. Don't paste secrets into prompts while the plugin is enabled. Switching off **Auto-write memories** stops Reeve storing turns, but each prompt is still sent for recall.
 
 Reeve's data practices are in the [Reeve privacy policy](https://meetreeve.com/privacy).
 
