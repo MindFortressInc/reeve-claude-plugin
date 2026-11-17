@@ -36,10 +36,11 @@ In Claude Code and Cowork the plugin runs three hooks. Each one calls a Reeve to
 That is everything the hooks send. **Tool calls, tool output, file contents and Claude's intermediate messages are not sent.**
 
 - **Where it goes:** your **personal** Reeve memory, under the account you signed in with. Only you can read it. It is not shared with your organization or team.
-- **What Reeve does with it:** Reeve removes credentials, tokens and personal identifiers it recognizes before storing a turn. It indexes captured text for search, and may condense each day's captured turns into short facts in the same personal memory. Recall returns memory relevant to your prompt, which Claude adds to that turn's context; when nothing is relevant, nothing is added.
+- **What Reeve does with it:** Reeve removes credentials, tokens and personal identifiers it recognizes before storing a turn. It indexes captured text for search, and may condense each day's captured turns into short facts in the same personal memory. Recall returns memory relevant to your prompt, which Claude adds to that turn's context. On the first prompt of a session it also adds the rules you saved in Reeve. Otherwise, when nothing is relevant, nothing is added.
+- **AI providers:** to do this, Reeve sends captured text and each recall prompt to OpenAI to create search embeddings, sends recall prompts and candidate memories to Voyage AI to rank results, and sends each day's captured turns to Anthropic's Claude to condense them.
 - The full text of each prompt leaves your machine, including anything you paste into it. Don't paste secrets into prompts while capture is on.
 
-How Reeve handles your data, including the AI providers it shares data with, is in the [Reeve privacy policy](https://meetreeve.com/privacy).
+Reeve's data practices are in the [Reeve privacy policy](https://meetreeve.com/privacy).
 
 ## Turn capture off
 
@@ -48,7 +49,7 @@ How Reeve handles your data, including the AI providers it shares data with, is 
 
 ## Delete your data
 
-- In **Settings > Knowledge > Your memory**, use **Forget…** to choose which groups of your memory to remove. Captured Claude Code sessions are in your personal memory there, under **Other**. You can also delete individual memories from the list on that page.
+- In **Settings > Knowledge > Your memory**, use **Forget…** to choose which groups of your memory to remove. Captured Claude Code turns are under **Other (n)**, and the facts Reeve condensed from them are under **Claude Code facts**; select both to remove captured sessions completely. The page shows the organization you have selected, so if you belong to more than one, repeat this in each. You can also delete individual memories from the list on that page.
 - To have everything Reeve stores about you deleted, email [privacy@mindfortress.com](mailto:privacy@mindfortress.com).
 
 ## Install
