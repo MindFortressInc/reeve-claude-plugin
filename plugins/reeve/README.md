@@ -76,5 +76,5 @@ If you also have the Reeve connector on in claude.ai, it can stay on. The plugin
 ## Privacy and license
 
 - Privacy policy: [meetreeve.com/privacy](https://meetreeve.com/privacy)
-- License: MIT
+- License: proprietary, all rights reserved. See [LICENSE](LICENSE)
 - Source: [github.com/MindFortressInc/reeve-claude-plugin](https://github.com/MindFortressInc/reeve-claude-plugin)
