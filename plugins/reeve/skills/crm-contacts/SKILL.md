@@ -32,8 +32,11 @@ Tools marked `act` run the same way through `act`.
    and exactly what will change, then call `crm_update_contacts` with the
    `contact_id` and only the fields that change. Passing `tags` replaces the
    contact's whole tag list, so include the tags it already has that should
-   stay. For a note, call `crm_create_contacts_notes` with the `contact_id`
-   and the `body`.
+   stay. When the change includes `tags`, call `crm_get_contacts` again just
+   before `crm_update_contacts` and build the new list from the tags it
+   returns. If they differ from the tags you showed, show the revised change
+   and ask again before writing. For a note, call `crm_create_contacts_notes`
+   with the `contact_id` and the `body`.
 4. **Report the result.** Confirm what changed from the tool's response. If
    the call returns `pending_approval` with a `gate_id`, tell the user and
    call `resolve_gate` with that `gate_id` after they approve.
