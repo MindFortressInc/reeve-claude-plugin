@@ -1,7 +1,7 @@
 {
   "name": "reeve",
   "displayName": "Reeve",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Reeve MCP tools plus automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve corpus",
   "author": {
     "name": "MindFortress",
@@ -14,7 +14,7 @@
     "memory",
     "mcp"
   ],
-  "license": "MIT",
+  "license": "LicenseRef-Proprietary",
   "icon": "assets/icon.png",
   "privacyPolicyUrl": "https://meetreeve.com/privacy"
 }
