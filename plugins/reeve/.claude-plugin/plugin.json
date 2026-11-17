@@ -1,8 +1,8 @@
 {
   "name": "reeve",
   "displayName": "Reeve",
-  "version": "0.2.1",
-  "description": "Reeve MCP tools plus automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve corpus",
+  "version": "0.3.0",
+  "description": "Reeve's CRM, QuickBooks reports, e-signatures and ad accounts in Claude, with workflow skills and automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve memory",
   "author": {
     "name": "MindFortress",
     "url": "https://github.com/MindFortressInc"
