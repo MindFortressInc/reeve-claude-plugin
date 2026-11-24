@@ -9,7 +9,7 @@
     {
       "name": "reeve",
       "source": "./plugins/reeve",
-      "description": "Reeve MCP tools plus automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve corpus"
+      "description": "Reeve's CRM, QuickBooks reports, e-signatures and ad accounts in Claude, with workflow skills and automatic memory: recall relevant memory on every prompt, capture each turn to your personal Reeve memory"
     }
   ]
 }

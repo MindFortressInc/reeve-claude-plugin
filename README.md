@@ -1,11 +1,14 @@
 # Reeve plugin for Claude Code
 
-A Claude Code plugin marketplace with one plugin, `reeve`. The plugin does two things:
+A Claude Code plugin marketplace with one plugin, `reeve`. The plugin does three things:
 
-1. It connects Claude Code to the remote Reeve MCP server at `https://api.meetreeve.com/mcp/code`, which provides the full Reeve tool surface.
-2. It turns on **automatic memory**. Before each prompt, relevant memory from your Reeve account is recalled into context. Each turn is captured to your personal Reeve corpus.
+1. It connects Claude to the remote Reeve MCP server at `https://api.meetreeve.com/mcp/directory/code`. That URL serves the Reeve tools the Claude directory lists: the same surface as the directory connector at `https://api.meetreeve.com/mcp/directory`, which leaves out the catch-all `use` tool, the `chat` agent, the tool that runs actions in connected third-party apps, and tools that move money, generate images, video or audio with AI, or place AI voice calls or create AI voice agents.
+2. It adds workflow skills: QuickBooks reports, CRM contacts, e-signature status, ad performance and memory search.
+3. It turns on **automatic memory** in Claude Code and Cowork. Before each prompt, relevant memory from your Reeve account is recalled into context. Each turn is captured to your personal Reeve memory. Chat doesn't run plugin hooks, so there the plugin is the connector plus the skills.
 
-Nothing runs locally. The plugin is only configuration: an MCP server entry plus `mcp_tool` hooks that call that server over Claude Code's own OAuth. It needs no API key, venv or local credential.
+[`plugins/reeve/README.md`](plugins/reeve/README.md) is the plugin's own description: exactly what the hooks send and where, how to turn capture off, and how to delete your data.
+
+Nothing runs locally. The plugin is only configuration and skills: an MCP server entry, `mcp_tool` hooks that call that server over Claude Code's own OAuth, and `SKILL.md` files. It needs no API key, venv or local credential.
 
 ## Install
 
@@ -26,14 +29,17 @@ Select `plugin:reeve:reeve` and complete the browser sign-in with your Reeve acc
 
 To remove it: `/plugin uninstall reeve@reeve`.
 
-### Upgrading from 0.1.x
+### Upgrading from an earlier version
 
-Version 0.2.0 moved the plugin's server from `https://api.meetreeve.com/mcp` to `https://api.meetreeve.com/mcp/code`. The server name stays `plugin:reeve:reeve`, but Claude Code stores each MCP server's OAuth token under the server name plus a hash of its type, URL and headers, so the token saved for the old URL is not used for the new one. After updating, run `/mcp`, select `plugin:reeve:reeve` and sign in again. Until you do, the hooks fail as non-blocking errors, as described above.
+Version 0.3.0 moved the plugin's server from `https://api.meetreeve.com/mcp/code` to `https://api.meetreeve.com/mcp/directory/code` (0.2.x used `/mcp/code`; 0.1.x used `/mcp`). The server name stays `plugin:reeve:reeve`, but Claude Code stores each MCP server's OAuth token under the server name plus a hash of its type, URL and headers, so the token saved for the old URL is not used for the new one. After updating, run `/mcp`, select `plugin:reeve:reeve` and sign in again. Until you do, the hooks fail as non-blocking errors, as described above.
+
+The new URL serves the directory's tool surface, not the full one: `use`, `chat`, the connected-app action runner, and the money, AI-generation and AI-voice tools are not on it. If you need those in Claude Code, add the full server under a different name with `claude mcp add --transport http reeve-full https://api.meetreeve.com/mcp` and keep the plugin for memory and skills.
 
 ### If you already have Reeve configured
 
-- **claude.ai or Claude Desktop Reeve connector.** This can stay on. The plugin has its own URL, `https://api.meetreeve.com/mcp/code`, which serves the same Reeve tools as the connector URLs (`https://api.meetreeve.com/mcp` and `https://api.meetreeve.com/mcp/claude`). Claude Code suppresses a plugin server whose URL matches a claude.ai connector (debug log: `Lazy dedup: suppressing 1 plugin server(s) that duplicate claude.ai connectors: plugin:reeve:reeve`), and the memory hooks then have no server to call. Because no connector uses `/mcp/code`, the plugin and a connector on `/mcp` or `/mcp/claude` coexist.
-- **A manually added server at the same URL** (`https://api.meetreeve.com/mcp/code`, added with `claude mcp add`, `.mcp.json` or `~/.claude.json`). Local, project and user servers take precedence over plugin servers, so Claude Code would hide this plugin's server and the memory hooks would have no server to call. Remove the manual entry and use the plugin.
+- **claude.ai or Claude Desktop Reeve connector.** This can stay on. The plugin has its own URL, `https://api.meetreeve.com/mcp/directory/code`, which no connector uses. The connector URLs are `https://api.meetreeve.com/mcp`, `https://api.meetreeve.com/mcp/claude` and, for the connector listed in the Claude directory, `https://api.meetreeve.com/mcp/directory`. Claude Code suppresses a plugin server whose URL matches a claude.ai connector (debug log: `Lazy dedup: suppressing 1 plugin server(s) that duplicate claude.ai connectors: plugin:reeve:reeve`), and the memory hooks then have no server to call. Because the plugin's URL differs from every connector URL, the plugin and a connector coexist. The cost is that Claude Code shows Reeve's tools twice, once from each.
+- **A manually added server at the same URL** (`https://api.meetreeve.com/mcp/directory/code`, added with `claude mcp add`, `.mcp.json` or `~/.claude.json`). Local, project and user servers take precedence over plugin servers, so Claude Code would hide this plugin's server and the memory hooks would have no server to call. Remove the manual entry and use the plugin.
+- **A manually added server at another Reeve URL** (for example `https://api.meetreeve.com/mcp` or `https://api.meetreeve.com/mcp/code`). It doesn't hide the plugin, but Claude Code then shows Reeve's tools twice. Remove it with `claude mcp remove <name>` unless you want the full tool surface alongside the plugin.
 
 ## What it captures
 
@@ -48,7 +54,7 @@ It does **not** capture tool calls, tool output, file contents or Claude's inter
 
 ## What it recalls
 
-On every `UserPromptSubmit`, `memory_recall_context` receives your prompt, `session_id` and `cwd`. It returns memory relevant to that prompt, which Claude Code adds to the turn's context. If nothing is relevant, it returns nothing and no context is added.
+On every `UserPromptSubmit`, `memory_recall_context` receives your prompt, `session_id` and `cwd`. It returns memory relevant to that prompt, which Claude Code adds to the turn's context. On the first prompt of a session it also returns the rules you saved in Reeve. Otherwise, if nothing is relevant, it returns nothing and no context is added.
 
 Recall runs on `UserPromptSubmit`, not `SessionStart`: Claude Code skips `mcp_tool` hooks on `SessionStart` at launch, because MCP servers aren't connected yet.
 
@@ -57,8 +63,9 @@ Both `UserPromptSubmit` hooks have a 15-second timeout, below Claude Code's 30-s
 ## Privacy
 
 - **What leaves your machine:** the full text of every prompt you submit (including anything you paste into it) and of Claude's final reply each turn, plus the session id and working-directory path. Don't paste secrets into prompts with the plugin enabled.
-- **Personal scope only.** Captured turns go to your **personal** Reeve corpus, under the account you signed in with in `/mcp`. They are not written to an organization or team scope.
-- **Opt out:** turn off automatic memory writes in your Reeve memory settings (`auto_write_enabled`). To stop the hooks entirely, disable the plugin (`/plugin`) or uninstall it.
+- **Personal scope only.** Captured turns go to your **personal** Reeve memory, under the account you signed in with in `/mcp`. They are not written to an organization or team scope.
+- **Opt out:** in the Reeve app, open **Settings > Knowledge > Your memory** ([meetreeve.com/settings/knowledge](https://meetreeve.com/settings/knowledge)) and switch off **Auto-write memories** (`auto_write_enabled`). Reeve then stores nothing the hooks send. To stop the hooks entirely, disable the plugin (`/plugin`) or uninstall it.
+- **Delete:** **Forget…** on the same page removes the memory groups you choose: captured turns are under **Other (n)** and the facts condensed from them under **Claude Code facts**, per organization. To have everything deleted, email [privacy@mindfortress.com](mailto:privacy@mindfortress.com).
 - The plugin contains no credentials. Authentication is the OAuth token Claude Code holds for the `reeve` server.
 
 ## Claude's native auto-memory stays on
@@ -70,8 +77,10 @@ This plugin does **not** set `CLAUDE_CODE_DISABLE_AUTO_MEMORY`. Claude Code's bu
 ```
 .claude-plugin/marketplace.json        marketplace "reeve", one plugin entry
 plugins/reeve/.claude-plugin/plugin.json
-plugins/reeve/.mcp.json                server "reeve" -> https://api.meetreeve.com/mcp/code
+plugins/reeve/README.md                the listing description: what is sent, opt out, delete
+plugins/reeve/.mcp.json                server "reeve" -> https://api.meetreeve.com/mcp/directory/code
 plugins/reeve/hooks/hooks.json         UserPromptSubmit + Stop mcp_tool hooks
+plugins/reeve/skills/<name>/SKILL.md   workflow skills
 ```
 
 Validate with:
@@ -79,4 +88,5 @@ Validate with:
 ```
 claude plugin validate --strict .
 claude plugin validate --strict plugins/reeve
+claude plugin validate --profile directory plugins/reeve
 ```
